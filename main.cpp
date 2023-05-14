@@ -1,6 +1,4 @@
-#include <iostream>
 #include "Test.h"
-#include "Spreadsheet.h"
 #include "Cell.h"
 
 int main() {

@@ -9,21 +9,8 @@
 
 class Cell {
 public:
-    Cell():m_value(" "){}
-    Cell(std::string);
-    Cell(const Cell&);
-    ~Cell() = default;
-
-    std::string getValue() const;
-    int toInt();
-    double toDouble();
-    std::string toString();
-    void set_value(const int);
-    void set_value(const double);
-    void set_value(const std::string&);
-
-
-private:
-    std::string m_value;
+    virtual std::string getValue() const = 0;
+    virtual void set_value(const std::string&) = 0;
+    virtual void reset() = 0;
 };
 #endif //SSC_CELL_H
