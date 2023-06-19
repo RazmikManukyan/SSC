@@ -3,8 +3,9 @@
 #include <iostream>
 #include <exception>
 #include <string>
+#include <utility>
+#include "Celll.h"
 #include "Spreadsheet.h"
-#include "Cell.h"
 
 Spreadsheet::Spreadsheet(int row, int column):m_row(row), m_column(column) {
     m_cell = new Cell*[m_row];
@@ -21,25 +22,23 @@ Spreadsheet::Spreadsheet(const Spreadsheet& oth):m_row(oth.m_row), m_column(oth.
     }
 }
 
-Spreadsheet& Spreadsheet::operator=(const Spreadsheet &oth) {
+
+Spreadsheet::Spreadsheet(Spreadsheet &&scr) noexcept {
+    swap(*this, scr);
+}
+
+Spreadsheet& Spreadsheet::operator=(Spreadsheet &oth) {
+    swap(*this, oth);
+    return *this;
+}
+
+Spreadsheet& Spreadsheet::operator=(Spreadsheet &&oth) noexcept{
     if(this == &oth) {
         return *this;
     }
 
-    for(int i = 0; i < m_row; ++i) {
-        delete[] m_cell[i];
-    }
-    delete[] m_cell;
-    m_cell = nullptr;
-
-    m_row = oth.m_row;
-    m_column = oth.m_column;
-    for (int i = 0; i < m_row; ++i) {
-        for (int j = 0; j < m_column; ++j) {
-            m_cell[i][j] = oth.m_cell[i][j];
-        }
-    }
-
+    cleanup();
+    moveFrom(oth);
     return *this;
 }
 
@@ -53,7 +52,7 @@ void Spreadsheet::print() {
 }
 
 bool Spreadsheet::inRange(int x, int y) const {
-    if (x < 0 && x > y - 1) {
+    if (x < 0 || x > y - 1) {
         return false;
     }
     return true;
@@ -70,23 +69,22 @@ void Spreadsheet::setCellAt(int r, int c, const std::string& str) {
 }
 
 void Spreadsheet::setCellAt(int r, int c, const Cell& cl) {
-    if (!inRange(r, m_row)) {
-        throw "Invalid argument for Row! ";
-    }
-    if (!inRange(c, m_column)) {
-        throw "Invalid argument for Column! ";
-    }
+    verifyCoordinate(r, c);
     m_cell[r][c] = cl;
 }
 
-Cell Spreadsheet::getCellAt(int r, int c) const {
+[[maybe_unused]] Cell Spreadsheet::getCellAt(int r, int c) const {
+    verifyCoordinate(r, c);
+    return m_cell[r][c];
+}
+
+void Spreadsheet::verifyCoordinate(std::size_t r, std::size_t c) const {
     if (!inRange(r, m_row)) {
         throw "Invalid argument for Row! ";
     }
     if (!inRange(c, m_column)) {
         throw "Invalid argument for Column! ";
     }
-    return m_cell[r][c];
 }
 
 void Spreadsheet::addRow(int r) {
@@ -341,13 +339,6 @@ void Spreadsheet::removeColumn(int c) {
     }
 }
 
-void Spreadsheet::cleanup() {
-    for(int i = 0; i < m_row; ++i) {
-        delete[] m_cell[i];
-    }
-    delete[] m_cell;
-    m_cell = nullptr;
-}
 
 Spreadsheet::~Spreadsheet() {
     for(int i = 0; i < m_row; ++i) {
@@ -356,4 +347,35 @@ Spreadsheet::~Spreadsheet() {
     delete[] m_cell;
     m_cell = nullptr;
 }
+
+void Spreadsheet::cleanup() noexcept{
+    for(int i = 0; i < m_row; ++i) {
+        delete[] m_cell[i];
+    }
+    delete[] m_cell;
+    m_cell = nullptr;
+    m_row = 0;
+    m_column = 0;
+}
+
+void Spreadsheet::moveFrom(Spreadsheet &oth) noexcept {
+    m_row = std::exchange(oth.m_row, 0);
+    m_column = std::exchange(oth.m_column, 0);
+    m_cell = std::exchange(oth.m_cell, nullptr);
+}
+
+void Spreadsheet::swap(Spreadsheet &oth) noexcept {
+    std::swap(m_row, oth.m_row);
+    std::swap(m_column, oth.m_column);
+    std::swap(m_cell, oth.m_cell);
+}
+
+void Spreadsheet::swap(Spreadsheet& lhs, Spreadsheet& rhs) {
+    lhs.swap(rhs);
+}
+
+
+
+
+
 //

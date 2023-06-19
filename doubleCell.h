@@ -16,6 +16,6 @@ public:
     void reset() override;
 
 private:
-    doublt m_value;
+    double m_value;
 };
 #endif //SSC_DOUBLECELL_H

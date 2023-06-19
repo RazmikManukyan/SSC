@@ -12,7 +12,7 @@ public:
     explicit stringCell(const std::string&);
 
     void set_value(const std::string&) override;
-    std::string getValue() const override;
+    [[nodiscard]] std::string getValue() const override;
     void reset() override;
 private:
     std::string m_value;

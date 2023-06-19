@@ -1,9 +1,13 @@
-#include "Test.h"
-#include "Cell.h"
+#include <iostream>
+#include <vector>
+#include "Celll.h"
+#include "Spreadsheet.h"
 
 int main() {
     Spreadsheet sh (3, 3);
-    Cell cl1, cl2, cl3;
+    Cell cl1;
+    Cell cl2;
+    Cell cl3;
     cl1.set_value("1");
     cl2.set_value("5");
     cl3.set_value("9");
@@ -19,6 +23,8 @@ int main() {
     //sh.addRow(0);
     //sh.addColumn(0);
     sh.print();
+
+
 
     return 0;
 }

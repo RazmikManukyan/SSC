@@ -7,9 +7,9 @@
 #include <iostream>
 #include <string>
 
-class Cell {
+class [[maybe_unused]] Cel {
 public:
-    virtual std::string getValue() const = 0;
+    [[nodiscard]] virtual std::string getValue() const = 0;
     virtual void set_value(const std::string&) = 0;
     virtual void reset() = 0;
 };
